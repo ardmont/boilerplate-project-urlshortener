@@ -3,7 +3,8 @@
 const express = require('express')
 const mongo = require('mongodb')
 const mongoose = require('mongoose')
-const dns = require('dns');
+const bodyParser = require('body-parser')
+const dns = require('dns')
 
 const cors = require('cors')
 
@@ -19,6 +20,8 @@ app.use(cors())
 
 /** this project needs to parse POST bodies **/
 // you should mount the body-parser here
+app.use(bodyParser.json()) // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 app.use('/public', express.static(process.cwd() + '/public'))
 
@@ -29,6 +32,18 @@ app.get('/', function (req, res) {
 // your first API endpoint...
 app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' })
+})
+
+app.post('/api/shorturl/new/', function (req, res) {
+  var url = req.body.url
+
+  dns.lookup(url, (err, address, family) => {
+    if (err) {
+      res.json({ 'error': 'invalid URL' })
+    } else {
+      res.send(url)
+    }
+  })
 })
 
 app.listen(port, function () {
