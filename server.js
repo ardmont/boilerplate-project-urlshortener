@@ -20,6 +20,8 @@ const dbPort = process.env.DBPORT
 
 /** this project needs a db !! **/
 mongoose.connect('mongodb://' + dbUser + ':' + dbPwd + '@' + dbHost + ':' + dbPort + '/urlshorter?authSource=admin', { useNewUrlParser: true })
+var schema = new mongoose.Schema({ original_url: 'String', short_url: 'Number' })
+var ShortUrl = mongoose.model('shortUrl', schema)
 
 app.use(cors())
 
@@ -43,10 +45,20 @@ app.post('/api/shorturl/new/', function (req, res) {
   var url = req.body.url
 
   dns.lookup(url, (err, address, family) => {
+    // Verify if the url is valid
     if (err) {
       res.json({ 'error': 'invalid URL' })
     } else {
-      res.send(url)
+      // Verifies if the url is already inserted on the database
+      ShortUrl.findOne({ 'original_url': url }, function (err, shortUrl) {
+        if (!err && shortUrl) {
+          res.json({ 'original_url': shortUrl.original_url, 'short_url': shortUrl.short_url })
+        } else {
+          res.send('doenst exist')
+        }
+      })
+      // ShortUrl.create({ 'original_url': url, 'short_url': 1 })
+      // res.send(url)
     }
   })
 })
