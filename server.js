@@ -43,9 +43,10 @@ app.get('/api/hello', function (req, res) {
 
 app.post('/api/shorturl/new/', function (req, res) {
   var url = req.body.url
-  url = url.replace(/https:\/\//, '')
+  // Removes scheme ( https://, ftp:// etc), port and path from url
+  var hostname = url.replace(/(.*\/\/)|(:\d*)|(\/.*)/g, '')
 
-  dns.lookup(url, (err, address, family) => {
+  dns.lookup(hostname, (err, address, family) => {
     // Verify if the url is valid
     if (err) {
       res.json({ 'error': 'invalid URL' })
