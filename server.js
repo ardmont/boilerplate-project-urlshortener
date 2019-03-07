@@ -56,11 +56,24 @@ app.post('/api/shorturl/new/', function (req, res) {
         if (!err && shortUrl) {
           res.json({ 'original_url': shortUrl.original_url, 'short_url': shortUrl.short_url })
         } else {
-          res.send('doenst exist')
+          // Get the last inserted url
+          ShortUrl.find().sort({ _id: -1 }).limit(1).exec((err, lastShortUrl) => {
+            var urlNumber
+            // Verifies if the collection is not empty
+            if (!err & lastShortUrl.length >= 1) {
+              // Get the last number used to a short url
+              var lastNumber = lastShortUrl[0].short_url
+              urlNumber = Number(lastNumber) + 1
+            } else {
+              urlNumber = 1
+            }
+            ShortUrl.create({ 'original_url': url, 'short_url': urlNumber }, (err, shortUrl) => {
+              if (err) res.send(err)
+              else res.json({ 'original_url': shortUrl.original_url, 'short_url': shortUrl.short_url })
+            })
+          })
         }
       })
-      // ShortUrl.create({ 'original_url': url, 'short_url': 1 })
-      // res.send(url)
     }
   })
 })
