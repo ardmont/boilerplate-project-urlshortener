@@ -43,6 +43,7 @@ app.get('/api/hello', function (req, res) {
 
 app.post('/api/shorturl/new/', function (req, res) {
   var url = req.body.url
+  url = url.replace(/https:\/\//, '')
 
   dns.lookup(url, (err, address, family) => {
     // Verify if the url is valid
