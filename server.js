@@ -12,14 +12,10 @@ const app = express()
 
 // Basic Configuration
 const port = process.env.PORT || 3000
-
-const dbUser = process.env.DBUSER
-const dbPwd = process.env.DBPWD
-const dbHost = process.env.DBHOST
-const dbPort = process.env.DBPORT
+const dbURL = process.env.MONGODBURL
 
 /** this project needs a db !! **/
-mongoose.connect('mongodb://' + dbUser + ':' + dbPwd + '@' + dbHost + ':' + dbPort + '/urlshorter?authSource=admin', { useNewUrlParser: true })
+mongoose.connect(dbURL, { useNewUrlParser: true })
 var schema = new mongoose.Schema({ original_url: 'String', short_url: 'Number' })
 var ShortUrl = mongoose.model('shortUrl', schema)
 
